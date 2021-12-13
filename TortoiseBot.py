@@ -498,4 +498,4 @@ async def 도움말(ctx):
 거북아 대기열삭제 [숫자] -> 대기열에서 입력한 숫자에 해당하는 노래를 지웁니다.""", color = 0x00ff00))
 
 
-bot.run('OTE5NTY4MTM3MDU2MzEzNDA0.YbXskA.EWxjgt8Rdpw_UqWUhiJVAH5BlT8')
+bot.run('OTE5NTY4MTM3MDU2MzEzNDA0.YbXskA.3QCZr-fBv0DiL4Pbwdh1Vb_O_bU')
