@@ -135,7 +135,7 @@ def play_next(ctx):
             del user[0]
             del musictitle[0]
             del song_queue[0]
-            vc.play(discord.FFmpegPCMAudio(URL,**FFMPEG_OPTIONS), after=lambda e: play_next(ctx)
+            vc.play(discord.FFmpegPCMAudio(URL,**FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
             client.loop.create_task(subtitle_song(ctx, URL))
 
     else:
