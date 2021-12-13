@@ -10,7 +10,7 @@ from discord import FFmpegPCMAudio
 import asyncio
 import time
 import os
-
+from urllib import request
 
 bot = commands.Bot(command_prefix='거북아 ')
 client = discord.Client()
@@ -53,6 +53,62 @@ def title(msg):
     
     return music, URL
 
+async def subtitle_song(ctx, suburl):
+    TEXT = suburl
+    rink = TEXT[-11:]
+    target = request.urlopen("http://video.google.com/timedtext?type=list&v="+rink)
+
+    soup = bs4.BeautifulSoup(target, "html.parser")
+    sub = 0
+    kor = 0
+    for track in soup.select("track"):
+        if sub == 0:
+            firstsub = track['lang_code']
+        if track['lang_code'] == 'ko':
+            kor += 1
+        sub += 1
+
+    if sub == 0: #자막이 없음
+        await ctx.send("""
+        ```
+        유튜브 자막이 포함되지 않은 영상입니다!
+        ```
+        """)
+        return 0
+
+    elif kor == 0 and sub != 0: #한글이 아닌 자막 재생
+        target = request.urlopen("http://video.google.com/timedtext?lang="+firstsub+"&v="+rink)
+        
+    elif kor == 1 and sub != 0:  #한글 자막 재생
+        target = request.urlopen("http://video.google.com/timedtext?lang=ko&v="+rink)
+
+    soup = bs4.BeautifulSoup(target, "html.parser")
+    subtimedur = []
+    subtimelast = []
+    last_time = 0
+    subtext = []
+
+    for text in soup.select("text"):
+        subtimedur.append(text['start'])
+        subtimelast.append(text['dur'])
+        subtext.append(text.string)
+    
+    for i in range(len(subtext)):
+        last_time += 1
+        embed = discord.Embed(description=subtext[i], color=0x00ff00)
+        if i == 0:
+            time.sleep(float(subtimedur[i]))
+            sub_message = await ctx.send(embed = embed)
+        else:
+            time.sleep(float(subtimedur[i]) - float(subtimedur[i-1]) - float(0.1))
+            await sub_message.edit(embed = embed)
+        
+    time.sleep(subtimelast[last_time])
+
+    await sub_message.delete()
+    del subtimedur [:]
+    del subtext [:]
+
 def play(ctx):
     global vc
     YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
@@ -63,7 +119,8 @@ def play(ctx):
     del song_queue[0]
     vc = get(bot.voice_clients, guild=ctx.guild)
     if not vc.is_playing():
-        vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS), after=lambda e: play_next(ctx)) 
+        vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+        client.loop.create_task(subtitle_song(ctx, URL))
 
 def play_next(ctx):
     if len(musicnow) - len(user) >= 2:
@@ -78,7 +135,8 @@ def play_next(ctx):
             del user[0]
             del musictitle[0]
             del song_queue[0]
-            vc.play(discord.FFmpegPCMAudio(URL,**FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+            vc.play(discord.FFmpegPCMAudio(URL,**FFMPEG_OPTIONS), after=lambda e: play_next(ctx)
+            client.loop.create_task(subtitle_song(ctx, URL))
 
     else:
         if not vc.is_playing():
@@ -149,6 +207,7 @@ async def 노래해(ctx, *, url):
         URL = info['formats'][0]['url']
         vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
         await ctx.send(embed = discord.Embed(title= "노래 재생", description = "현재 " + url + "을(를) 재생하고 있습니다.", color = 0x00ff00))
+        await subtitle_song(ctx,url)
     else:
         await ctx.send("노래가 이미 재생되고 있습니다!")
 
@@ -190,6 +249,7 @@ async def 불러봐(ctx, *, msg):
             info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
         await ctx.send(embed = discord.Embed(title= "노래 재생", description = "현재 " + musicnow[0] + "을(를) 재생하고 있습니다.", color = 0x00ff00))
+        await subtitle_song(ctx,url)
         vc.play(discord.FFmpegPCMAudio(URL, **FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
     else:
         user.append(msg)
