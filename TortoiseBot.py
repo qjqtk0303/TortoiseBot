@@ -11,6 +11,7 @@ import asyncio
 import time
 import os
 from urllib import request
+import random
 
 bot = commands.Bot(command_prefix='거북아 ')
 client = discord.Client()
@@ -487,6 +488,32 @@ async def 목록재생(ctx):
             play(ctx)
         else:
             await ctx.send("노래가 이미 재생되고 있어요!")
+
+
+@bot.command()
+async def 목록셔플(ctx):
+    try:
+        global musicnow, user, musictitle,song_queue
+        numbershuffle = len(musicnow) - len(user)
+        for i in range(numbershuffle):
+            shuffles.append(musicnow[0])
+            del musicnow[0]
+        combine = list(zip(user, musicnow, musictitle, song_queue))
+        random.shuffle(combine)
+        a, b, c, d = list(zip(*combine))
+
+        user = list(a)
+        musicnow = list(b)
+        musictitle = list(c)
+        song_queue = list(d)
+
+        for i in range(numbershuffle):
+            musicnow.insert(0, shuffles[i])
+
+        del shuffles[:]
+        await ctx.send("목록이 정상적으로 셔플되었습니다.")
+    except:
+        await ctx.send("셔플할 목록이 없습니다!")
 
 @bot.command()
 async def 즐겨찾기(ctx):
