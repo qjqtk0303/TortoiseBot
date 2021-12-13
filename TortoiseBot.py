@@ -181,18 +181,18 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx: commands.Context, error: commands.CommandError):
     if isinstance(error, commands.CommandNotFound):
-        message = "...예?"
+        await ctx.send("...예?")
     elif isinstance(error, commands.CommandOnCooldown):
-        message = f"미안하지만 {round(error.retry_after, 1)}초 후에 다시 시도하세요!"
+        await ctx.send(f"미안하지만 {round(error.retry_after, 1)}초 후에 다시 시도하세요!")
     elif isinstance(error, commands.MissingPermissions):
-        message = "권한이 없어요!"
+        await ctx.send("권한이 없어요!")
     elif isinstance(error, commands.MissingRequiredArgument):
-        message = "말은 끝까지 하셔야죠!"
+        await ctx.send("말은 끝까지 하셔야죠!")
     elif isinstance(error, commands.UserInputError):
-        message = "대체 뭘 입력하신건가요?!"
-    else:
-        message = "뭔가...뭔가 잘못됬어요!"
-    await ctx.send(message)
+        await ctx.send("대체 뭘 입력하신건가요?!")
+    #else:
+        #message = "뭔가...뭔가 잘못됬어요!"
+    #await ctx.send(message)
 
         
 @bot.command()
