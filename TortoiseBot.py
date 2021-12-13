@@ -489,6 +489,18 @@ async def 목록재생(ctx):
         else:
             await ctx.send("노래가 이미 재생되고 있어요!")
 
+@bot.command()
+async def 스킵(ctx):
+    if len(user) > 1:
+        if vc.is_playing():
+            vc.stop()
+            global number
+            number = 0
+            await ctx.send(embed = discord.Embed(title = "스킵", description = musicnow[1] + "을(를) 다음에 재생합니다!", color = 0x00ff00))
+        else:
+            await ctx.send("노래가 이미 재생되고 있어요!")
+    else:
+        await ctx.send("목록에 노래가 2개 이상 없네요..")
 
 @bot.command()
 async def 목록셔플(ctx):
