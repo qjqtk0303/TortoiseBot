@@ -24,6 +24,8 @@ userF = [] #유저 정보 저장 배열
 userFlist = [] #유저 개인 노래 저장 배열
 allplaylist = [] #플레이리스트 배열
 
+number = 1
+
 def title(msg):
     global music
 
@@ -141,6 +143,17 @@ def play_next(ctx):
     else:
         if not vc.is_playing():
             client.loop.create_task(vc.disconnect())
+
+def again(ctx, url):
+    global number
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
+    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+    if number:
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+                info = ydl.extract_info(url, download=False)
+        URL = info['formats'][0]['url']
+        if not vc.is_playing():
+            vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS), after = lambda e: again(ctx, url))
 
 def load_chrome_driver():
       
@@ -288,6 +301,8 @@ async def 다시불러(ctx):
 async def 그만해(ctx):
     if vc.is_playing():
         vc.stop()
+        global number
+        number = 0
         await ctx.send(embed = discord.Embed(title= "노래끄기", description = musicnow[0]  + "을(를) 종료했습니다.", color = 0x00ff00))
     else:
         await ctx.send("지금 노래가 재생되지 않네요.")
@@ -298,6 +313,41 @@ async def 뭐불러(ctx):
         await ctx.send("지금은 노래가 재생되지 않네요..")
     else:
         await ctx.send(embed = discord.Embed(title = "지금노래", description = "현재 " + musicnow[0] + "을(를) 재생하고 있습니다.", color = 0x00ff00))
+
+@bot.command()
+async def 반복재생(ctx, *, msg):
+      
+    try:
+        global vc
+        vc = await ctx.message.author.voice.channel.connect()   
+    except:
+        try:
+            await vc.move_to(ctx.message.author.voice.channel)
+        except:
+            pass
+    
+    global entireText
+    global number
+    number = 1
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
+    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+    
+    if len(musicnow) - len(user) >= 1:
+        for i in range(len(musicnow) - len(user)):
+            del musicnow[0]
+            
+    driver = load_chrome_driver()
+    driver.get("https://www.youtube.com/results?search_query="+msg+"+lyrics")
+    source = driver.page_source
+    bs = bs4.BeautifulSoup(source, 'lxml')
+    entire = bs.find_all('a', {'id': 'video-title'})
+    entireNum = entire[0]
+    entireText = entireNum.text.strip()
+    musicnow.insert(0, entireText)
+    test1 = entireNum.get('href')
+    url = 'https://www.youtube.com'+test1
+    await ctx.send(embed = discord.Embed(title= "반복재생", description = "현재 " + musicnow[0] + "을(를) 반복재생하고 있습니다.", color = 0x00ff00))
+    again(ctx, url)
 
 @bot.command()
 async def 멜론차트(ctx):
