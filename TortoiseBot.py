@@ -71,7 +71,7 @@ async def subtitle_song(ctx, suburl):
     if sub == 0: #자막이 없음
         await ctx.send("""
         ```
-        유튜브 자막이 포함되지 않은 영상입니다...!
+        유튜브 자막이 포함되지 않은 영상입니다!
         ```
         """)
         return 0
