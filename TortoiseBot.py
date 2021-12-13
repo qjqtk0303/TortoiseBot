@@ -103,7 +103,7 @@ async def on_ready():
     print('connection was succesful')
     await bot.change_presence(status=discord.Status.online, activity = discord.Game('노래 찾으러 기어가기'))
 
-    if not discord.opus.is loaded():
+    if not discord.opus.is_loaded():
         discord.opus.load_opus('opus')
 
 @bot.command()
