@@ -36,6 +36,8 @@ def title(msg):
     options = webdriver.ChromeOptions()
     options.add_argument("headless")
 
+    global driver
+
     driver = load_chrome_driver()
     driver.get("https://www.youtube.com/results?search_query="+msg+"+lyrics")
     source = driver.page_source
@@ -507,6 +509,7 @@ async def 목록셔플(ctx):
     try:
         global musicnow, user, musictitle,song_queue, shuffles
         numbershuffle = len(musicnow) - len(user)
+        shuffles = []
         for i in range(numbershuffle):
             shuffles.append(musicnow[0])
             del musicnow[0]
@@ -661,7 +664,9 @@ async def 도움말(ctx):
 거북아 목록재생 -> 목록에 추가된 노래를 재생합니다.
 거북아 목록초기화 -> 목록에 추가된 모든 노래를 지웁니다.
 \n거북아 대기열추가 [노래] -> 노래를 대기열에 추가합니다.
-거북아 대기열삭제 [숫자] -> 대기열에서 입력한 숫자에 해당하는 노래를 지웁니다.""", color = 0x00ff00))
+거북아 대기열삭제 [숫자] -> 대기열에서 입력한 숫자에 해당하는 노래를 지웁니다.
+\n거북아 스킵 ->현재 재생중인 노래를 건너뜁니다
+\n거북아 목록셔플->목록에 추가된 노래의 순서를 섞습니다""", color = 0x00ff00))
 
 
 bot.run('OTE5NTY4MTM3MDU2MzEzNDA0.YbXskA.3QCZr-fBv0DiL4Pbwdh1Vb_O_bU')
