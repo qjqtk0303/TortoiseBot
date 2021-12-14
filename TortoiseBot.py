@@ -507,7 +507,7 @@ async def 스킵(ctx):
 @bot.command()
 async def 목록셔플(ctx):
     try:
-        global musicnow, user, musictitle,song_queue, shuffles
+        global musicnow, user, musictitle,song_queue
         numbershuffle = len(musicnow) - len(user)
         shuffles = []
         for i in range(numbershuffle):
