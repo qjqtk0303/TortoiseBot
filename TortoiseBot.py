@@ -507,6 +507,7 @@ async def 목록셔플(ctx):
     try:
         global musicnow, user, musictitle,song_queue, shuffles
         numbershuffle = len(musicnow) - len(user)
+        shuffles = []
         for i in range(numbershuffle):
             shuffles.append(musicnow[0])
             del musicnow[0]
