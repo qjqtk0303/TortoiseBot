@@ -12,6 +12,11 @@ import time
 import os
 from urllib import request
 import random
+from dotenv import load_dotenv
+
+load_dotenv()
+
+token = os.getenv("TOKEN")
 
 bot = commands.Bot(command_prefix='거북아 ')
 client = discord.Client()
@@ -669,4 +674,4 @@ async def 도움말(ctx):
 \n거북아 목록셔플->목록에 추가된 노래의 순서를 섞습니다""", color = 0x00ff00))
 
 
-bot.run('OTE5NTY4MTM3MDU2MzEzNDA0.YbXskA.3QCZr-fBv0DiL4Pbwdh1Vb_O_bU')
+bot.run(token)
