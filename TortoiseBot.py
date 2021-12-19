@@ -12,11 +12,9 @@ import time
 import os
 from urllib import request
 import random
-from dotenv import load_dotenv
 
-load_dotenv()
 
-token = os.getenv("TOKEN")
+token = os.environ["TOKEN"]
 
 bot = commands.Bot(command_prefix='거북아 ')
 client = discord.Client()
