@@ -241,8 +241,8 @@ async def 노래해(ctx, *, url):
         with YoutubeDL(YDL_OPTIONS) as ydl:
             info = ydl.extract_info(url, download=False)
         URL = info['formats'][0]['url']
-        vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
         await ctx.send(embed = discord.Embed(title= "노래 재생", description = "현재 " + url + "을(를) 재생하고 있습니다.", color = 0x00ff00))
+        vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
         await subtitle_song(ctx,url)
     else:
         await ctx.send("노래가 이미 재생되고 있습니다!")
