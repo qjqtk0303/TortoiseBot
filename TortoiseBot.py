@@ -230,6 +230,12 @@ async def 들어와(ctx):
 async def 나가(ctx):
     try:
         await vc.disconnect()
+        try:
+            await sub_message.delete()
+            del subtimedur [:]
+            del subtext [:]
+        except:
+                pass
     except:
         await ctx.send("이미 그 채널에 속해있지 않아요...")
 
