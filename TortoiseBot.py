@@ -30,6 +30,17 @@ allplaylist = [] #플레이리스트 배열
 
 number = 1
 
+def URLPLAY(url):
+    YDL_OPTIONS = {'format': 'bestaudio','noplaylist':'True'}
+    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+
+    if not vc.is_playing():
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(url, download=False)
+        URL = info['formats'][0]['url']
+        vc.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+        client.loop.create_task(subtitle_song(ctx, URL))
+
 def title(msg):
     global music
 
@@ -646,6 +657,23 @@ async def on_reaction_add(reaction, users):
             elif str(reaction.emoji) == '\U0001F4DD':
                 await reaction.message.channel.send("플레이리스트가 나오면 생길 기능이랍니다. 추후에 올릴 영상을 기다려주세요!")
 
+            elif str(reaction.emoji) == '\U00000031\U0000FE0F\U000020E3':
+                URLPLAY(rinklist[0])
+                await ctx.send("정상적으로 진행되었습니다.")
+            elif str(reaction.emoji) == '\U00000032\U0000FE0F\U000020E3':
+                URLPLAY(rinklist[1])
+                await ctx.send("정상적으로 진행되었습니다.")
+            elif str(reaction.emoji) == '\U00000033\U0000FE0F\U000020E3':
+                URLPLAY(rinklist[2])
+                await ctx.send("정상적으로 진행되었습니다.")
+            elif str(reaction.emoji) == '\U00000034\U0000FE0F\U000020E3':
+                URLPLAY(rinklist[3])
+                await ctx.send("정상적으로 진행되었습니다.")
+            elif str(reaction.emoji) == '\U00000035\U0000FE0F\U000020E3':
+                URLPLAY(rinklist[0])
+                await ctx.send("정상적으로 진행되었습니다.")
+
+
 @bot.command()
 async def 도움말(ctx):
     await ctx.send(embed = discord.Embed(title='도움말',description="""
@@ -670,6 +698,46 @@ async def 도움말(ctx):
 거북아 대기열삭제 [숫자] -> 대기열에서 입력한 숫자에 해당하는 노래를 지웁니다.
 \n거북아 스킵 ->현재 재생중인 노래를 건너뜁니다
 \n거북아 목록셔플->목록에 추가된 노래의 순서를 섞습니다""", color = 0x00ff00))
+
+
+@bot.command()
+async def 검색(ctx, *, msg):
+    global rinklist
+    rinklist = [0,0,0,0,0]
+
+    try:
+        global vc
+        vc = await ctx.message.author.voice.channel.connect()
+    except:
+        try:
+            await vc.move_to(ctx.message.author.voice.channel)
+        except:
+            await ctx.send("채널에 유저가 접속해있지 않네요..")
+
+    YDL_OPTIONS = {'format': 'bestaudio','noplaylist':'True'}
+    FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+
+    driver = load_chrome_driver()
+    driver.get("https://www.youtube.com/results?search_query="+msg)
+    source = driver.page_source
+    bs = bs4.BeautifulSoup(source, 'lxml')
+    entire = bs.find_all('a', {'id': 'video-title'})
+    for i in range(0, 4):
+        entireNum = entire[i]
+        entireText = entireNum.text.strip()  # 영상제목
+        test1 = entireNum.get('href')  # 하이퍼링크
+        rinklist[i] = 'https://www.youtube.com'+test1
+        Text = Text + str(i+1)+'번째 영상' + entireText +'\n링크 : '+ rinklist[i]
+    
+    await ctx.send(embed = discord.Embed(title= "검색한 영상들입니다.", description = Text.strip(), color = 0x00ff00))
+    Alist = await ctx.send(embed = embed)
+
+    await Alist.add_reaction("\U00000031\U0000FE0F\U000020E3")
+
+    await Alist.add_reaction("\U00000032\U0000FE0F\U000020E3")
+    await Alist.add_reaction("\U00000033\U0000FE0F\U000020E3")
+    await Alist.add_reaction("\U00000034\U0000FE0F\U000020E3")
+    await Alist.add_reaction("\U00000035\U0000FE0F\U000020E3")
 
 
 bot.run(token)
