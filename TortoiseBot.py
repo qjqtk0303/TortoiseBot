@@ -630,7 +630,7 @@ async def 즐겨찾기삭제(ctx, *, number):
                 await ctx.send("즐겨찾기에 노래가 없어서 지울 수 없어요!")
 
 @bot.event
-async def on_reaction_add(reaction, users):
+async def on_reaction_add(reaction, users,ctx):
     if users.bot == 1:
         pass
     else:
